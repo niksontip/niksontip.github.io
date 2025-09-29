@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таблица заданий</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 150, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 200, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(120, 0, 255, 0.05) 0%, transparent 30%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .edit-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(145deg, #2575fc, #6a11cb);
+        }
+
+        .edit-btn:active {
+            transform: translateY(1px);
+        }
+
+        header {
+            margin-bottom: 30px;
+            animation: fadeIn 1.5s ease-out;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            transition: opacity 3s ease;
+        }
+
+        .arrow-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            color: #ffcc00;
+            margin-top: 10px;
+            transition: opacity 3s ease;
+        }
+
+        .arrow {
+            font-size: 1.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 30px auto;
+            max-width: 1000px;
+        }
+
+        .category {
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 15px;
+            background: rgba(30, 30, 70, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 80px;
+            animation: slideIn 0.8s ease-out;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .category:hover {
+            background: rgba(40, 40, 90, 0.8);
+        }
+
+        .question-cell {
+            border-radius: 10px;
+            padding: 20px 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            animation: colorShift 8s infinite alternate;
+        }
+
+        .question-cell:nth-child(6) { animation-delay: 0s; }
+        .question-cell:nth-child(7) { animation-delay: 0.5s; }
+        .question-cell:nth-child(8) { animation-delay: 1s; }
+        .question-cell:nth-child(9) { animation-delay: 1.5s; }
+        .question-cell:nth-child(10) { animation-delay: 2s; }
+        .question-cell:nth-child(11) { animation-delay: 0.5s; }
+        .question-cell:nth-child(12) { animation-delay: 1s; }
+        .question-cell:nth-child(13) { animation-delay: 1.5s; }
+        .question-cell:nth-child(14) { animation-delay: 2s; }
+        .question-cell:nth-child(15) { animation-delay: 2.5s; }
+        .question-cell:nth-child(16) { animation-delay: 1s; }
+        .question-cell:nth-child(17) { animation-delay: 1.5s; }
+        .question-cell:nth-child(18) { animation-delay: 2s; }
+        .question-cell:nth-child(19) { animation-delay: 2.5s; }
+        .question-cell:nth-child(20) { animation-delay: 3s; }
+        .question-cell:nth-child(21) { animation-delay: 1.5s; }
+        .question-cell:nth-child(22) { animation-delay: 2s; }
+        .question-cell:nth-child(23) { animation-delay: 2.5s; }
+        .question-cell:nth-child(24) { animation-delay: 3s; }
+        .question-cell:nth-child(25) { animation-delay: 3.5s; }
+        .question-cell:nth-child(26) { animation-delay: 2s; }
+        .question-cell:nth-child(27) { animation-delay: 2.5s; }
+        .question-cell:nth-child(28) { animation-delay: 3s; }
+        .question-cell:nth-child(29) { animation-delay: 3.5s; }
+        .question-cell:nth-child(30) { animation-delay: 4s; }
+
+        .question-cell:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .question-cell:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .question-cell.completed {
+            transform: scale(0.95);
+            opacity: 0.7;
+        }
+
+        .question-cell.completed::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .points {
+            font-size: 1.8rem;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeIn 2s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions h2 {
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .instructions p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(100, 100, 255, 0.3);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #ff7e5f;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(100, 100, 255, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.save {
+            background: linear-gradient(145deg, #6a11cb, #2575fc);
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes colorShift {
+            0% {
+                background: linear-gradient(145deg, #1a237e, #283593);
+            }
+            25% {
+                background: linear-gradient(145deg, #283593, #3949ab);
+            }
+            50% {
+                background: linear-gradient(145deg, #3949ab, #5c6bc0);
+            }
+            75% {
+                background: linear-gradient(145deg, #5c6bc0, #7986cb);
+            }
+            100% {
+                background: linear-gradient(145deg, #7986cb, #9fa8da);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .question-cell {
+                min-height: 80px;
+                font-size: 1.2rem;
+            }
+            
+            .edit-btn {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="edit-btn" id="editBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Изменить
+    </button>
+
+    <div class="container">
+        <header>
+            <h1 class="pulse">Добро пожаловать</h1>
+            <p class="subtitle" id="subtitle">Для начала поменяйте свои ссылки</p>
+            <div class="arrow-hint" id="arrowHint">
+                <span class="arrow">➔</span> Нажмите кнопку "Изменить" слева сверху
+            </div>
+        </header>
+
+        <div class="game-board" id="gameBoard">
+            <!-- Категории и задания будут добавлены через JavaScript -->
+        </div>
+
+        <div class="instructions">
+            <h2>Как пользоваться таблицей?</h2>
+            <p>1. Нажмите кнопку "Изменить", чтобы настроить ссылки и названия категорий</p>
+            <p>2. Кликните на ячейку с заданием, чтобы открыть ссылку</p>
+            <p>3. Выполните задание и вернитесь на эту страницу</p>
+            <p>4. Прогресс выполнения сбрасывается при закрытии страницы</p>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования ссылок -->
+    <div class="modal" id="linkModal">
+        <div class="modal-content">
+            <h2>Изменить ссылку</h2>
+            <input type="text" id="linkInput" placeholder="Введите новую ссылку">
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="cancelLinkBtn">Отмена</button>
+                <button class="modal-btn save" id="saveLinkBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования категорий -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <h2>Изменить категорию</h2>
+            <input type="text" id="categoryInput" placeholder="Введите новое название категории">
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="cancelCategoryBtn">Отмена</button>
+                <button class="modal-btn save" id="saveCategoryBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gameBoard = document.getElementById('gameBoard');
+            const editBtn = document.getElementById('editBtn');
+            const linkModal = document.getElementById('linkModal');
+            const linkInput = document.getElementById('linkInput');
+            const saveLinkBtn = document.getElementById('saveLinkBtn');
+            const cancelLinkBtn = document.getElementById('cancelLinkBtn');
+            const categoryModal = document.getElementById('categoryModal');
+            const categoryInput = document.getElementById('categoryInput');
+            const saveCategoryBtn = document.getElementById('saveCategoryBtn');
+            const cancelCategoryBtn = document.getElementById('cancelCategoryBtn');
+            const subtitle = document.getElementById('subtitle');
+            const arrowHint = document.getElementById('arrowHint');
+            
+            let isEditMode = false;
+            let currentEditingCell = null;
+            let currentEditingCategory = null;
+            let editModeUsed = false;
+
+            // Данные для таблицы (категории и задания)
+            const gameData = {
+                categories: [
+                    "HTML/CSS",
+                    "JavaScript",
+                    "Алгоритмы",
+                    "Базы данных",
+                    "Фреймворки"
+                ],
+                questions: [
+                    [
+                        { points: 100, link: "https://example.com/task1", completed: false },
+                        { points: 200, link: "https://example.com/task2", completed: false },
+                        { points: 300, link: "https://example.com/task3", completed: false },
+                        { points: 400, link: "https://example.com/task4", completed: false },
+                        { points: 500, link: "https://example.com/task5", completed: false }
+                    ],
+                    [
+                        { points: 100, link: "https://example.com/task6", completed: false },
+                        { points: 200, link: "https://example.com/task7", completed: false },
+                        { points: 300, link: "https://example.com/task8", completed: false },
+                        { points: 400, link: "https://example.com/task9", completed: false },
+                        { points: 500, link: "https://example.com/task10", completed: false }
+                    ],
+                    [
+                        { points: 100, link: "https://example.com/task11", completed: false },
+                        { points: 200, link: "https://example.com/task12", completed: false },
+                        { points: 300, link: "https://example.com/task13", completed: false },
+                        { points: 400, link: "https://example.com/task14", completed: false },
+                        { points: 500, link: "https://example.com/task15", completed: false }
+                    ],
+                    [
+                        { points: 100, link: "https://example.com/task16", completed: false },
+                        { points: 200, link: "https://example.com/task17", completed: false },
+                        { points: 300, link: "https://example.com/task18", completed: false },
+                        { points: 400, link: "https://example.com/task19", completed: false },
+                        { points: 500, link: "https://example.com/task20", completed: false }
+                    ],
+                    [
+                        { points: 100, link: "https://example.com/task21", completed: false },
+                        { points: 200, link: "https://example.com/task22", completed: false },
+                        { points: 300, link: "https://example.com/task23", completed: false },
+                        { points: 400, link: "https://example.com/task24", completed: false },
+                        { points: 500, link: "https://example.com/task25", completed: false }
+                    ]
+                ]
+            };
+
+            // Загрузка данных из localStorage
+            function loadData() {
+                const savedProgress = sessionStorage.getItem('gameProgress');
+                const savedLinks = localStorage.getItem('gameLinks');
+                const savedCategories = localStorage.getItem('gameCategories');
+                
+                if (savedProgress) {
+                    const progress = JSON.parse(savedProgress);
+                    for (let i = 0; i < gameData.questions.length; i++) {
+                        for (let j = 0; j < gameData.questions[i].length; j++) {
+                            if (progress[i] && progress[i][j]) {
+                                gameData.questions[i][j].completed = true;
+                            }
+                        }
+                    }
+                }
+                
+                if (savedLinks) {
+                    const links = JSON.parse(savedLinks);
+                    for (let i = 0; i < gameData.questions.length; i++) {
+                        for (let j = 0; j < gameData.questions[i].length; j++) {
+                            if (links[i] && links[i][j]) {
+                                gameData.questions[i][j].link = links[i][j];
+                            }
+                        }
+                    }
+                }
+                
+                if (savedCategories) {
+                    gameData.categories = JSON.parse(savedCategories);
+                }
+            }
+
+            // Сохранение прогресса в sessionStorage
+            function saveProgress() {
+                const progress = [];
+                for (let i = 0; i < gameData.questions.length; i++) {
+                    progress[i] = [];
+                    for (let j = 0; j < gameData.questions[i].length; j++) {
+                        progress[i][j] = gameData.questions[i][j].completed;
+                    }
+                }
+                sessionStorage.setItem('gameProgress', JSON.stringify(progress));
+            }
+
+            // Сохранение ссылок в localStorage
+            function saveLinks() {
+                const links = [];
+                for (let i = 0; i < gameData.questions.length; i++) {
+                    links[i] = [];
+                    for (let j = 0; j < gameData.questions[i].length; j++) {
+                        links[i][j] = gameData.questions[i][j].link;
+                    }
+                }
+                localStorage.setItem('gameLinks', JSON.stringify(links));
+            }
+
+            // Сохранение категорий в localStorage
+            function saveCategories() {
+                localStorage.setItem('gameCategories', JSON.stringify(gameData.categories));
+            }
+
+            // Создание игрового поля
+            function createGameBoard() {
+                gameBoard.innerHTML = '';
+                
+                // Добавляем категории
+                gameData.categories.forEach((category, index) => {
+                    const categoryElement = document.createElement('div');
+                    categoryElement.className = 'category';
+                    categoryElement.textContent = category;
+                    categoryElement.dataset.index = index;
+                    
+                    categoryElement.addEventListener('click', function() {
+                        if (isEditMode) {
+                            currentEditingCategory = index;
+                            categoryInput.value = category;
+                            categoryModal.style.display = 'flex';
+                        }
+                    });
+                    
+                    gameBoard.appendChild(categoryElement);
+                });
+
+                // Добавляем ячейки с заданиями
+                for (let i = 0; i < 5; i++) { // 5 строк (по сложности)
+                    for (let j = 0; j < 5; j++) { // 5 столбцов (категории)
+                        const question = gameData.questions[j][i];
+                        const questionElement = document.createElement('div');
+                        questionElement.className = `question-cell ${question.completed ? 'completed' : ''}`;
+                        questionElement.innerHTML = `<div class="points">${question.points}</div>`;
+                        
+                        questionElement.addEventListener('click', function() {
+                            if (isEditMode) {
+                                // Режим редактирования
+                                currentEditingCell = { row: j, col: i };
+                                linkInput.value = question.link;
+                                linkModal.style.display = 'flex';
+                            } else if (!question.completed) {
+                                // Открываем задание в новой вкладке
+                                window.open(question.link, '_blank');
+                                
+                                // Помечаем как выполненное
+                                question.completed = true;
+                                questionElement.classList.add('completed');
+                                saveProgress();
+                                
+                                // Анимация подтверждения
+                                questionElement.style.transform = 'scale(0.9)';
+                                setTimeout(() => {
+                                    questionElement.style.transform = 'scale(0.95)';
+                                }, 150);
+                            }
+                        });
+                        
+                        gameBoard.appendChild(questionElement);
+                    }
+                }
+            }
+
+            // Переключение режима редактирования
+            editBtn.addEventListener('click', function() {
+                isEditMode = !isEditMode;
+                
+                if (isEditMode) {
+                    editBtn.style.background = 'linear-gradient(145deg, #ff7e5f, #feb47b)';
+                    editBtn.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Завершить редактирование
+                    `;
+                    
+                    // Если это первое использование режима редактирования, скрываем подсказку
+                    if (!editModeUsed) {
+                        editModeUsed = true;
+                        subtitle.style.animation = 'fadeOut 3s forwards';
+                        arrowHint.style.animation = 'fadeOut 3s forwards';
+                        
+                        setTimeout(() => {
+                            subtitle.style.display = 'none';
+                            arrowHint.style.display = 'none';
+                        }, 3000);
+                    }
+                } else {
+                    editBtn.style.background = 'linear-gradient(145deg, #6a11cb, #2575fc)';
+                    editBtn.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Изменить
+                    `;
+                }
+            });
+
+            // Сохранение новой ссылки
+            saveLinkBtn.addEventListener('click', function() {
+                if (currentEditingCell && linkInput.value.trim() !== '') {
+                    const { row, col } = currentEditingCell;
+                    gameData.questions[row][col].link = linkInput.value.trim();
+                    saveLinks();
+                    linkModal.style.display = 'none';
+                    createGameBoard(); // Пересоздаем поле для обновления ссылок
+                }
+            });
+
+            // Сохранение новой категории
+            saveCategoryBtn.addEventListener('click', function() {
+                if (currentEditingCategory !== null && categoryInput.value.trim() !== '') {
+                    gameData.categories[currentEditingCategory] = categoryInput.value.trim();
+                    saveCategories();
+                    categoryModal.style.display = 'none';
+                    createGameBoard(); // Пересоздаем поле для обновления категорий
+                }
+            });
+
+            // Отмена редактирования ссылки
+            cancelLinkBtn.addEventListener('click', function() {
+                linkModal.style.display = 'none';
+            });
+
+            // Отмена редактирования категории
+            cancelCategoryBtn.addEventListener('click', function() {
+                categoryModal.style.display = 'none';
+            });
+
+            // Закрытие модальных окон при клике вне их
+            window.addEventListener('click', function(event) {
+                if (event.target === linkModal) {
+                    linkModal.style.display = 'none';
+                }
+                if (event.target === categoryModal) {
+                    categoryModal.style.display = 'none';
+                }
+            });
+
+            // Инициализация игры1
+            loadData();
+            createGameBoard();
+        });
+    </script>
+</body>
+</html>
