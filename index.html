@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Голосование Сервера 2024</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+body>
+    <div class="container">
+        <header class="server-header">
+            <div class="logo-container">
+                <div class="discord-icon">👾</div>
+                <div class="server-title">
+                    <h1>ЕЖЕГОДНОЕ ГОЛОСОВАНИЕ</h1>
+                    <div class="hub-name">SERVER AWARDS</div>
+                </div>
+            </div>
+            <div class="subtitle">Пришло время выбрать легенд, героев и главных клоунов нашего сервера. Твой голос решит судьбу номинаций!</div>
+            <div class="year-badge">2024</div>
+        </header>
+
+        <main>
+            <div class="cta-section">
+                <h2>Статистика активности</h2>
+                <div class="vote-count">
+                    <span>Уже проголосовало человек:</span>
+                </div>
+                <span id="live-total-counter" class="total-votes-live">Загрузка...</span>
+                
+                <div style="margin-top: 30px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <a href="vote.html" class="vote-button glow-effect">
+                        НАЧАТЬ ГОЛОСОВАНИЕ ➜
+                    </a>
+                    <a href="results.html" class="vote-button" style="background: linear-gradient(90deg, #2f3136, #40444b);">
+                        📊 РЕЗУЛЬТАТЫ
+                    </a>
+                </div>
+                <p class="note">*Голосовать можно только 1 раз с одного устройства</p>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="instructions">
+                <h2><i class="fas fa-info-circle"></i> Как это работает?</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div>
+                            <h3>Авторизация</h3>
+                            <p>Система автоматически проверит твой ID устройства. Регистрация не требуется.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div>
+                            <h3>Выбор</h3>
+                            <p>14 номинаций. Выбирай мудро, изменить голос будет нельзя.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div>
+                            <h3>Итоги</h3>
+                            <p>Результаты обновляются в прямом эфире сразу после твоего голоса.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-icons">
+                <span>🛡️ Fair Play</span>
+                <span>🔒 Secure Voting</span>
+                <span>⚡ Live Updates</span>
+            </div>
+            <div class="copyright">© 2024 Discord Server Community Awards</div>
+        </footer>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

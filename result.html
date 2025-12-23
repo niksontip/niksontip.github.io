@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты Live</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← На главную</a>
+        
+        <main>
+            <div class="server-header" style="border-radius: 20px; margin-bottom: 30px;">
+                <h1>📊 LIVE РЕЗУЛЬТАТЫ</h1>
+                <p>Данные обновляются в реальном времени</p>
+                <div class="vote-count">Проголосовало: <span id="total-voters-res" style="color:#FFD700; margin-left: 5px;">0</span></div>
+            </div>
+
+            <div id="results-container" class="steps" style="grid-template-columns: 1fr;">
+                <div style="text-align:center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #7289DA;"></i>
+                    <p>Загрузка данных из базы...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="script.js"></script>
+    
+    <script>
+        // Принудительно запускаем функцию отображения результатов
+        document.addEventListener('DOMContentLoaded', () => {
+            initResultsPage(); 
+        });
+    </script>
+</body>
+</html>
