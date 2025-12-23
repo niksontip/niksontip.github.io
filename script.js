@@ -193,3 +193,178 @@ function initResultsPage() {
         }
     });
 }
+
+// === АДМИН-ПАНЕЛЬ ===
+
+// Показать/скрыть админ-панель
+document.addEventListener('DOMContentLoaded', function() {
+    const adminBtn = document.getElementById('admin-btn');
+    const adminModal = document.getElementById('admin-modal');
+    
+    if (adminBtn && adminModal) {
+        // Добавляем обработчик двойного клика для показа админ-панели
+        adminBtn.addEventListener('dblclick', function() {
+            showAdminPanel();
+        });
+        
+        // Также закрываем по клику на фон
+        adminModal.addEventListener('click', function(e) {
+            if (e.target === adminModal) {
+                hideAdminPanel();
+            }
+        });
+        
+        // Загружаем текущие данные при открытии
+        window.showAdminPanel = function() {
+            adminModal.style.display = 'flex';
+            loadAdminData();
+        };
+        
+        window.hideAdminPanel = function() {
+            adminModal.style.display = 'none';
+        };
+    }
+});
+
+// Загрузить данные для админ-панели
+function loadAdminData() {
+    // Загружаем общее количество голосов
+    db.ref('stats/totalVotes').once('value').then(snap => {
+        const totalVotes = snap.val() || 0;
+        const totalInput = document.getElementById('admin-total-votes');
+        if (totalInput) totalInput.value = totalVotes;
+    });
+}
+
+// Настроить общее количество голосов
+function adjustTotalVotes(change) {
+    const totalInput = document.getElementById('admin-total-votes');
+    let current = parseInt(totalInput.value) || 0;
+    current = Math.max(0, current + change);
+    totalInput.value = current;
+}
+
+// Установить общее количество голосов
+function setTotalVotes() {
+    const totalInput = document.getElementById('admin-total-votes');
+    const newTotal = parseInt(totalInput.value) || 0;
+    
+    if (confirm(`Установить общее количество голосов в ${newTotal}?`)) {
+        db.ref('stats/totalVotes').set(newTotal)
+            .then(() => {
+                alert('Обновлено!');
+                loadAdminData();
+            })
+            .catch(error => {
+                alert('Ошибка: ' + error.message);
+            });
+    }
+}
+
+// Обновить голоса кандидата
+function updateCandidateVotes() {
+    const category = document.getElementById('admin-category').value;
+    const candidate = document.getElementById('admin-candidate').value.trim();
+    const votes = parseInt(document.getElementById('admin-candidate-votes').value) || 0;
+    
+    if (!candidate) {
+        alert('Введите тег кандидата!');
+        return;
+    }
+    
+    if (confirm(`Установить ${votes} голосов для ${candidate} в категории ${category}?`)) {
+        db.ref(`results/${category}/${candidate}`).set(votes)
+            .then(() => {
+                alert('Голосов обновлено!');
+                // Обновляем общий счетчик
+                recalculateTotalVotes();
+            })
+            .catch(error => {
+                alert('Ошибка: ' + error.message);
+            });
+    }
+}
+
+// Удалить кандидата
+function deleteCandidate() {
+    const category = document.getElementById('admin-category').value;
+    const candidate = document.getElementById('admin-candidate').value.trim();
+    
+    if (!candidate) {
+        alert('Введите тег кандидата!');
+        return;
+    }
+    
+    if (confirm(`Удалить кандидата ${candidate} из категории ${category}?`)) {
+        db.ref(`results/${category}/${candidate}`).remove()
+            .then(() => {
+                alert('Кандидат удален!');
+                // Обновляем общий счетчик
+                recalculateTotalVotes();
+            })
+            .catch(error => {
+                alert('Ошибка: ' + error.message);
+            });
+    }
+}
+
+// Пересчитать общее количество голосов
+function recalculateTotalVotes() {
+    db.ref('results').once('value').then(snapshot => {
+        const data = snapshot.val();
+        let total = 0;
+        
+        if (data) {
+            // Считаем голоса в первой категории (в каждой категории одинаковое количество голосов)
+            const firstCat = Object.values(data)[0];
+            if (firstCat) {
+                const votesInCat = Object.values(firstCat).reduce((sum, count) => sum + count, 0);
+                // Общее количество = голоса в одной категории
+                total = votesInCat;
+            }
+        }
+        
+        db.ref('stats/totalVotes').set(total)
+            .then(() => {
+                console.log('Общий счетчик обновлен:', total);
+            });
+    });
+}
+
+// Очистить ВСЕ голоса
+function clearAllVotes() {
+    if (confirm('⚠️ ВНИМАНИЕ!\n\nВы собираетесь удалить ВСЕ голоса и результаты. Это действие НЕЛЬЗЯ отменить.\n\nПродолжить?')) {
+        if (confirm('Последнее предупреждение: ВСЕ данные голосования будут удалены навсегда!')){
+            db.ref('results').remove()
+                .then(() => db.ref('votes').remove())
+                .then(() => db.ref('stats/totalVotes').set(0))
+                .then(() => {
+                    alert('Все голоса очищены!');
+                    hideAdminPanel();
+                })
+                .catch(error => {
+                    alert('Ошибка: ' + error.message);
+                });
+        }
+    }
+}
+
+// Сбросить голоса пользователей (очистить историю голосований)
+function resetUserVotes() {
+    if (confirm('Сбросить историю голосований пользователей?\n\nЭто позволит им голосовать снова, но текущие результаты останутся.')) {
+        db.ref('votes').remove()
+            .then(() => {
+                alert('История голосований очищена!\n\nПользователи могут голосовать заново.');
+                hideAdminPanel();
+            })
+            .catch(error => {
+                alert('Ошибка: ' + error.message);
+            });
+    }
+}
+
+// Обновить данные
+function refreshData() {
+    loadAdminData();
+    alert('Данные обновлены!');
+}
